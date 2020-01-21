@@ -9,21 +9,42 @@ var divUsuarios = $('#divUsuarios');
 var formEnviar = $('#formEnviar');
 var txtMensaje = $('#txtMensaje');
 var divChatbox = $('#divChatbox');
+var divTitle = $('#divTitle');
+var idActivo = params.get('sala');
+
+var personasCache;
 
 function renderizarUsuarios(personas) {
+    personasCache = personas;
     console.log(personas);
+    var classActivo = 'class="active"';
+    var salaActiva = '';
+
+    var nombre = '';
+
+    if (!idActivo || idActivo === params.get('sala')) {
+        salaActiva = classActivo;
+        nombre = params.get('sala');
+    }
 
     var html = '';
 
     html += '<li>';
-    html += '<a href="javascript:void(0)" class="active"> Chat de <span> ' + params.get('sala') + '</span></a>';
+    html += '<a data-id="' + params.get('sala') + '" href="javascript:void(0)" ' + salaActiva + '> Chat de <span> ' + params.get('sala') + '</span></a>';
     html += '</li>';
 
     for (var i = 0; i < personas.length; i++) {
+        var personaActiva = '';
+        if (personas[i].id === idActivo) {
+            personaActiva = classActivo;
+            nombre = personas[i].nombre;
+        }
         html += '<li>';
-        html += '<a data-id="' + personas[i].id + '" href="javascript:void(0)"><img src="assets/images/users/1.jpg" alt="user-img" class="img-circle"> <span>' + personas[i].nombre + ' <small class="text-success">online</small></span></a>';
+        html += '<a data-id="' + personas[i].id + '" href="javascript:void(0)" ' + personaActiva + '><img src="assets/images/users/1.jpg" alt="user-img" class="img-circle"> <span>' + personas[i].nombre + ' <small class="text-success">online</small></span></a>';
         html += '</li>';
     }
+
+    divTitle.html('<h3 class="box-title">Sala de chat <small>' + nombre + '</small></h3>');
 
     divUsuarios.html(html);
 
@@ -85,9 +106,10 @@ function scrollBottom() {
 //Listeners
 divUsuarios.on('click', 'a', function() {
     var id = $(this).data('id');
-
+    console.log(id);
     if (id) {
-        console.log(id);
+        idActivo = id;
+        renderizarUsuarios(personasCache);
     }
 
 });
